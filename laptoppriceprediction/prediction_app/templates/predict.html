@@ -14,387 +14,203 @@
       <p class="text-xl text-gray-600">Get accurate price predictions for your dream laptop configuration!</p>
     </div>
 
-    <!-- Main Layout -->
-    <div class="grid lg:grid-cols-3 gap-8">
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white p-8 rounded-3xl shadow-2xl">
+        <div class="flex items-center space-x-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <span class="text-lg font-semibold">🔮 Analyzing configuration...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration Panel - At Top -->
+    <div class="mb-8">
+      <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          🎯 Configuration
+        </h2>
+        
+        <form class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="laptopForm">
+
+          <!-- Brand -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
+            <select name="brand" id="brand" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+              <option value="" disabled selected>Choose brand</option>
+              <option value="HP">HP</option>
+              <option value="Dell">Dell</option>
+              <option value="Lenovo">Lenovo</option>
+              <option value="Asus">Asus</option>
+              <option value="Acer">Acer</option>
+              <option value="Apple">Apple</option>
+              <option value="MSI">MSI</option>
+              <option value="Samsung">Samsung</option>
+              <option value="Infinix">Infinix</option>
+              <option value="Xiaomi">Xiaomi</option>
+            </select>
+          </div>
+
+          <!-- Processor -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Processor</label>
+            <select name="processor" id="processor" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select processor</option>
+              <option value="12th Gen Intel Core i5">12th Gen Intel Core i5</option>
+              <option value="13th Gen Intel Core i7">13th Gen Intel Core i7</option>
+              <option value="11th Gen Intel Core i5">11th Gen Intel Core i5</option>
+              <option value="5th Gen AMD Ryzen 5">5th Gen AMD Ryzen 5</option>
+              <option value="7th Gen AMD Ryzen 7">7th Gen AMD Ryzen 7</option>
+              <option value="12th Gen Intel Core i7">12th Gen Intel Core i7</option>
+              <option value="13th Gen Intel Core i5">13th Gen Intel Core i5</option>
+              <option value="11th Gen Intel Core i7">11th Gen Intel Core i7</option>
+              <option value="5th Gen AMD Ryzen 7">5th Gen AMD Ryzen 7</option>
+            </select>
+          </div>
+
+          <!-- RAM -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">RAM (GB)</label>
+            <select name="ram" id="ram" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select RAM</option>
+              <option value="4">4 GB</option>
+              <option value="8">8 GB</option>
+              <option value="16">16 GB</option>
+              <option value="32">32 GB</option>
+              <option value="64">64 GB</option>
+            </select>
+          </div>
+
+          <!-- Storage -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Storage (GB)</label>
+            <select name="storage" id="storage" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select storage</option>
+              <option value="128">128 GB</option>
+              <option value="256">256 GB</option>
+              <option value="512">512 GB</option>
+              <option value="1024">1024 GB (1TB)</option>
+              <option value="2048">2048 GB (2TB)</option>
+            </select>
+          </div>
+
+          <!-- Storage Type -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Storage Type</label>
+            <select name="storage_type" id="storage_type" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select storage type</option>
+              <option value="SSD">SSD</option>
+              <option value="Hard-Disk">Hard Disk</option>
+            </select>
+          </div>
+
+          <!-- Display Size -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Display Size (inches)</label>
+            <input type="number" step="0.1" name="display_size" id="display_size" placeholder="e.g. 15.6" min="11" max="18" value="15.6" required 
+                   class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+
+          <!-- Resolution -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Screen Resolution</label>
+            <select name="resolution" id="resolution" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select resolution</option>
+              <option value="1366x768">1366x768 (HD)</option>
+              <option value="1920x1080">1920x1080 (Full HD)</option>
+              <option value="2560x1440">2560x1440 (QHD)</option>
+              <option value="3840x2160">3840x2160 (4K UHD)</option>
+            </select>
+          </div>
+
+          <!-- GPU -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Graphics Card</label>
+            <select name="gpu" id="gpu" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select graphics card</option>
+              <option value="Intel Integrated">Intel Integrated</option>
+              <option value="Intel Iris Xe">Intel Iris Xe</option>
+              <option value="NVIDIA GeForce RTX 3050">NVIDIA GeForce RTX 3050</option>
+              <option value="NVIDIA GeForce RTX 4060">NVIDIA GeForce RTX 4060</option>
+              <option value="AMD Radeon">AMD Radeon</option>
+              <option value="NVIDIA GeForce GTX 1650">NVIDIA GeForce GTX 1650</option>
+            </select>
+          </div>
+
+          <!-- Operating System -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Operating System</label>
+            <select name="os" id="os" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select OS</option>
+              <option value="Windows 11 OS">Windows 11</option>
+              <option value="Windows 10 OS">Windows 10</option>
+              <option value="Mac OS">macOS</option>
+              <option value="DOS OS">DOS</option>
+              <option value="Chrome OS">Chrome OS</option>
+            </select>
+          </div>
+
+          <!-- Specification Rating -->
+          <div class="md:col-span-2 lg:col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Specification Rating</label>
+            <input type="range" name="spec_rating" id="spec_rating" min="50" max="90" value="70" step="1"
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>50</span>
+              <span id="spec_rating_value">70</span>
+              <span>90</span>
+            </div>
+          </div>
+
+          <!-- Weight -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Weight (kg)</label>
+            <input type="number" step="0.1" name="weight" id="weight" placeholder="e.g. 2.1" min="0.5" max="5" value="2.1" required 
+                   class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <!-- Warranty -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Warranty (years)</label>
+            <select name="warranty" id="warranty" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="" disabled selected>Select warranty</option>
+              <option value="1">1 Year</option>
+              <option value="2">2 Years</option>
+              <option value="3">3 Years</option>
+            </select>
+          </div>
+
+          <!-- Predict Button -->
+          <div class="md:col-span-2 lg:col-span-3 mt-4">
+            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition duration-300 shadow-lg">
+              🔮 Predict Price
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="grid lg:grid-cols-2 gap-8" id="resultsSection" style="display: none;">
       
-      <!-- Configuration Panel -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            🎯 Configuration
-          </h2>
-          
-          <form method="POST" class="space-y-6" id="laptopForm">
-            {% csrf_token %}
-
-            <!-- Brand -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
-              <select name="brand" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                <option value="" disabled selected>Choose brand</option>
-                <option value="HP">HP</option>
-                <option value="Dell">Dell</option>
-                <option value="Lenovo">Lenovo</option>
-                <option value="Asus">Asus</option>
-                <option value="Acer">Acer</option>
-                <option value="Apple">Apple</option>
-                <option value="MSI">MSI</option>
-                <option value="Samsung">Samsung</option>
-                <option value="Infinix">Infinix</option>
-                <option value="Xiaomi">Xiaomi</option>
-              </select>
-            </div>
-
-            <!-- Processor -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Processor</label>
-              <select name="processor" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select processor</option>
-                <option value="12th Gen Intel Core i5">12th Gen Intel Core i5</option>
-                <option value="13th Gen Intel Core i7">13th Gen Intel Core i7</option>
-                <option value="11th Gen Intel Core i5">11th Gen Intel Core i5</option>
-                <option value="5th Gen AMD Ryzen 5">5th Gen AMD Ryzen 5</option>
-                <option value="7th Gen AMD Ryzen 7">7th Gen AMD Ryzen 7</option>
-                <option value="12th Gen Intel Core i7">12th Gen Intel Core i7</option>
-                <option value="13th Gen Intel Core i5">13th Gen Intel Core i5</option>
-                <option value="11th Gen Intel Core i7">11th Gen Intel Core i7</option>
-                <option value="5th Gen AMD Ryzen 7">5th Gen AMD Ryzen 7</option>
-              </select>
-            </div>
-
-            <!-- RAM -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">RAM (GB)</label>
-              <select name="ram" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select RAM</option>
-                <option value="4">4 GB</option>
-                <option value="8">8 GB</option>
-                <option value="16">16 GB</option>
-                <option value="32">32 GB</option>
-                <option value="64">64 GB</option>
-              </select>
-            </div>
-
-            <!-- Storage -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Storage (GB)</label>
-              <select name="storage" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select storage</option>
-                <option value="128">128 GB</option>
-                <option value="256">256 GB</option>
-                <option value="512">512 GB</option>
-                <option value="1024">1024 GB (1TB)</option>
-                <option value="2048">2048 GB (2TB)</option>
-              </select>
-            </div>
-
-            <!-- Storage Type -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Storage Type</label>
-              <select name="storage_type" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select storage type</option>
-                <option value="SSD">SSD</option>
-                <option value="Hard-Disk">Hard Disk</option>
-              </select>
-            </div>
-
-            <!-- Display Size -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Display Size (inches)</label>
-              <input type="number" step="0.1" name="display_size" placeholder="e.g. 15.6" min="11" max="18" value="15.6" required 
-                     class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-
-            <!-- Resolution -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Screen Resolution</label>
-              <select name="resolution" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select resolution</option>
-                <option value="1366x768">1366x768 (HD)</option>
-                <option value="1920x1080">1920x1080 (Full HD)</option>
-                <option value="2560x1440">2560x1440 (QHD)</option>
-                <option value="3840x2160">3840x2160 (4K UHD)</option>
-              </select>
-            </div>
-
-            <!-- GPU -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Graphics Card</label>
-              <select name="gpu" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select graphics card</option>
-                <option value="Intel Integrated">Intel Integrated</option>
-                <option value="Intel Iris Xe">Intel Iris Xe</option>
-                <option value="NVIDIA GeForce RTX 3050">NVIDIA GeForce RTX 3050</option>
-                <option value="NVIDIA GeForce RTX 4060">NVIDIA GeForce RTX 4060</option>
-                <option value="AMD Radeon">AMD Radeon</option>
-                <option value="NVIDIA GeForce GTX 1650">NVIDIA GeForce GTX 1650</option>
-              </select>
-            </div>
-
-            <!-- Operating System -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Operating System</label>
-              <select name="os" required class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="" disabled selected>Select OS</option>
-                <option value="Windows 11 OS">Windows 11</option>
-                <option value="Windows 10 OS">Windows 10</option>
-                <option value="Mac OS">macOS</option>
-                <option value="DOS OS">DOS</option>
-                <option value="Chrome OS">Chrome OS</option>
-              </select>
-            </div>
-
-            <!-- Additional Features -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-700 mb-4">📊 Additional Features</h3>
-              
-              <!-- Specification Rating -->
-              <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Specification Rating</label>
-                <input type="range" name="spec_rating" min="50" max="90" value="70" step="0.1" 
-                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" 
-                       oninput="document.getElementById('spec_rating_value').textContent = this.value">
-                <div class="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>50</span>
-                  <span id="spec_rating_value">70</span>
-                  <span>90</span>
-                </div>
-              </div>
-              
-              <!-- Warranty -->
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Warranty (Years)</label>
-                <select name="warranty" required class="w-full px-4 py-3 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                  <option value="0">No Warranty</option>
-                  <option value="1" selected>1 Year</option>
-                  <option value="2">2 Years</option>
-                  <option value="3">3 Years</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Budget -->
-            <div class="bg-green-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-700 mb-4">💰 Budget</h3>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Enter your budget (₹)</label>
-              <input type="number" name="budget" min="10000" max="500000" value="50000" step="5000" required 
-                     class="w-full px-4 py-3 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-            </div>
-
-            <!-- Predict Button -->
-            <div class="mt-8">
-              <button type="submit"
-                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-lg py-4 rounded-xl shadow-xl transition transform hover:scale-105 duration-200 flex items-center justify-center">
-                🔮 Predict Price
-              </button>
-            </div>
-          </form>
+      <!-- Prediction Result -->
+      <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          💰 Price Prediction
+        </h2>
+        <div id="predictionResult" class="text-center">
+          <div class="text-4xl font-bold text-indigo-600 mb-2" id="predictedPrice">₹0</div>
+          <p class="text-gray-600">Estimated Price</p>
         </div>
       </div>
 
-      <!-- Results & Analysis Panel -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            📊 Results & Analysis
-          </h2>
-          
-          {% if predicted_price %}
-            <!-- Prediction Result -->
-            <div class="mb-8">
-              <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
-                <div class="text-center">
-                  <h3 class="text-lg font-semibold text-gray-700 mb-2">💰 Predicted Price</h3>
-                  <div class="text-4xl font-bold text-green-600 mb-4">₹{{ predicted_price|floatformat:0 }}</div>
-                  
-                  {% if budget %}
-                    {% if predicted_price <= budget %}
-                      <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg inline-block">
-                        ✅ Within budget!
-                      </div>
-                    {% else %}
-                      <div class="bg-red-100 text-red-800 px-4 py-2 rounded-lg inline-block">
-                        ❌ Over budget!
-                      </div>
-                    {% endif %}
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            
-            <!-- Tabs -->
-            <div class="border-b border-gray-200 mb-6">
-              <nav class="-mb-px flex space-x-8">
-                <button class="tab-button active py-2 px-1 border-b-2 border-indigo-500 font-medium text-sm text-indigo-600" data-tab="analysis">
-                  📈 Price Analysis
-                </button>
-                <button class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="comparison">
-                  🔍 Comparison
-                </button>
-                <button class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="recommendations">
-                  💡 Recommendations
-                </button>
-                <button class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="summary">
-                  📋 Summary
-                </button>
-              </nav>
-            </div>
-            
-            <!-- Tab Content -->
-            <div id="analysis" class="tab-content">
-              <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 class="text-lg font-semibold mb-4">Price Breakdown</h4>
-                  <div class="space-y-2">
-                    <div class="flex justify-between"><span>Base Price:</span><span class="font-semibold">₹20,000</span></div>
-                    <div class="flex justify-between"><span>Brand Premium:</span><span class="font-semibold">₹{{ brand_premium|default:"5,000" }}</span></div>
-                    <div class="flex justify-between"><span>RAM:</span><span class="font-semibold">₹{{ ram_cost|default:"16,000" }}</span></div>
-                    <div class="flex justify-between"><span>Storage:</span><span class="font-semibold">₹{{ storage_cost|default:"25,600" }}</span></div>
-                    <div class="flex justify-between"><span>Graphics Card:</span><span class="font-semibold">₹{{ gpu_cost|default:"15,000" }}</span></div>
-                    <div class="flex justify-between"><span>Display:</span><span class="font-semibold">₹{{ display_cost|default:"5,200" }}</span></div>
-                  </div>
-                </div>
-                <div>
-                  <h4 class="text-lg font-semibold mb-4">Feature Impact</h4>
-                  <div class="space-y-3">
-                    <div class="flex items-center">
-                      <span class="w-20 text-sm">RAM</span>
-                      <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                        <div class="bg-red-500 h-2 rounded-full" style="width: 85%"></div>
-                      </div>
-                      <span class="text-sm font-semibold">High</span>
-                    </div>
-                    <div class="flex items-center">
-                      <span class="w-20 text-sm">Storage</span>
-                      <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width: 70%"></div>
-                      </div>
-                      <span class="text-sm font-semibold">Medium</span>
-                    </div>
-                    <div class="flex items-center">
-                      <span class="w-20 text-sm">GPU</span>
-                      <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width: 60%"></div>
-                      </div>
-                      <span class="text-sm font-semibold">Medium</span>
-                    </div>
-                    <div class="flex items-center">
-                      <span class="w-20 text-sm">Display</span>
-                      <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
-                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 40%"></div>
-                      </div>
-                      <span class="text-sm font-semibold">Low</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div id="comparison" class="tab-content hidden">
-              <h4 class="text-lg font-semibold mb-4">Price Comparison with Similar Laptops</h4>
-              <div class="grid md:grid-cols-4 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg text-center">
-                  <h5 class="font-semibold text-blue-800">Budget Option</h5>
-                  <div class="text-2xl font-bold text-blue-600">₹45,000</div>
-                  <p class="text-sm text-blue-600">Similar specs, lower brand</p>
-                </div>
-                <div class="bg-green-50 p-4 rounded-lg text-center border-2 border-green-300">
-                  <h5 class="font-semibold text-green-800">Your Configuration</h5>
-                  <div class="text-2xl font-bold text-green-600">₹{{ predicted_price|floatformat:0 }}</div>
-                  <p class="text-sm text-green-600">Selected specs</p>
-                </div>
-                <div class="bg-purple-50 p-4 rounded-lg text-center">
-                  <h5 class="font-semibold text-purple-800">Premium Option</h5>
-                  <div class="text-2xl font-bold text-purple-600">₹75,000</div>
-                  <p class="text-sm text-purple-600">Enhanced features</p>
-                </div>
-                <div class="bg-red-50 p-4 rounded-lg text-center">
-                  <h5 class="font-semibold text-red-800">High-end</h5>
-                  <div class="text-2xl font-bold text-red-600">₹95,000</div>
-                  <p class="text-sm text-red-600">Top-tier specs</p>
-                </div>
-              </div>
-            </div>
-            
-            <div id="recommendations" class="tab-content hidden">
-              <h4 class="text-lg font-semibold mb-4">Budget Recommendations</h4>
-              {% if budget and predicted_price > budget %}
-                <div class="bg-yellow-50 p-4 rounded-lg mb-4">
-                  <p class="text-yellow-800 font-semibold mb-2">💡 Your configuration exceeds budget</p>
-                  <p class="text-yellow-700 mb-2">🔧 Consider these alternatives:</p>
-                  <ul class="text-yellow-700 space-y-1 ml-4">
-                    <li>• Reduce RAM from current selection</li>
-                    <li>• Choose a smaller storage capacity</li>
-                    <li>• Select integrated graphics instead of dedicated GPU</li>
-                    <li>• Consider a different brand</li>
-                  </ul>
-                </div>
-              {% elif budget and predicted_price < budget %}
-                <div class="bg-green-50 p-4 rounded-lg mb-4">
-                  <p class="text-green-800 font-semibold mb-2">💰 You have extra budget available!</p>
-                  <p class="text-green-700 mb-2">🚀 Consider these upgrades:</p>
-                  <ul class="text-green-700 space-y-1 ml-4">
-                    <li>• Increase RAM for better performance</li>
-                    <li>• Upgrade to a better graphics card</li>
-                    <li>• Choose a larger, higher-resolution display</li>
-                    <li>• Add more storage capacity</li>
-                  </ul>
-                </div>
-              {% else %}
-                <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                  <p class="text-blue-800 font-semibold mb-2">✅ Your configuration fits well within your budget!</p>
-                  <p class="text-blue-700">🎯 This is a good balance of features and price.</p>
-                </div>
-              {% endif %}
-            </div>
-            
-            <div id="summary" class="tab-content hidden">
-              <h4 class="text-lg font-semibold mb-4">Selected Configuration</h4>
-              <div class="grid md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <div class="flex justify-between"><span class="font-semibold">Brand:</span><span>{{ inputs.brand }}</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">Processor:</span><span>{{ inputs.processor }}</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">RAM:</span><span>{{ inputs.ram }} GB</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">Storage:</span><span>{{ inputs.storage }} GB {{ inputs.storage_type }}</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">Graphics:</span><span>{{ inputs.gpu }}</span></div>
-                </div>
-                <div class="space-y-2">
-                  <div class="flex justify-between"><span class="font-semibold">Display:</span><span>{{ inputs.display_size }}" {{ inputs.resolution }}</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">OS:</span><span>{{ inputs.os }}</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">Warranty:</span><span>{{ inputs.warranty }} years</span></div>
-                  <div class="flex justify-between"><span class="font-semibold">Spec Rating:</span><span>{{ inputs.spec_rating }}/100</span></div>
-                  <div class="flex justify-between border-t pt-2"><span class="font-bold text-lg">Predicted Price:</span><span class="font-bold text-lg text-green-600">₹{{ predicted_price|floatformat:0 }}</span></div>
-                </div>
-              </div>
-            </div>
-            
-          {% else %}
-            <!-- No Prediction Yet -->
-            <div class="text-center py-12">
-              <div class="text-6xl mb-4">💻</div>
-              <h3 class="text-xl font-semibold text-gray-700 mb-4">Configure Your Laptop</h3>
-              <p class="text-gray-600 mb-8">👈 Configure your laptop specifications and click 'Predict Price' to see results!</p>
-              
-              <!-- Sample Predictions -->
-              <div class="grid md:grid-cols-3 gap-4 mt-8">
-                <div class="bg-blue-50 p-4 rounded-lg">
-                  <h4 class="font-semibold text-blue-800 mb-2">Budget Laptop</h4>
-                  <p class="text-sm text-blue-600 mb-2">Intel i3, 8GB RAM, 256GB SSD</p>
-                  <div class="text-lg font-bold text-blue-600">₹35,000</div>
-                </div>
-                <div class="bg-green-50 p-4 rounded-lg">
-                  <h4 class="font-semibold text-green-800 mb-2">Gaming Laptop</h4>
-                  <p class="text-sm text-green-600 mb-2">Intel i7, 16GB RAM, RTX 3060</p>
-                  <div class="text-lg font-bold text-green-600">₹85,000</div>
-                </div>
-                <div class="bg-purple-50 p-4 rounded-lg">
-                  <h4 class="font-semibold text-purple-800 mb-2">Premium Ultrabook</h4>
-                  <p class="text-sm text-purple-600 mb-2">Intel i7, 16GB RAM, 512GB SSD</p>
-                  <div class="text-lg font-bold text-purple-600">₹75,000</div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
+      <!-- Configuration Summary -->
+      <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          📋 Configuration Summary
+        </h2>
+        <div id="configSummary" class="space-y-2">
+          <!-- Summary will be populated by JavaScript -->
         </div>
       </div>
     </div>
@@ -402,33 +218,51 @@
 </div>
 
 <script>
-// Tab functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const tabButtons = document.querySelectorAll('.tab-button');
-  const tabContents = document.querySelectorAll('.tab-content');
+// Update range slider display
+document.getElementById('spec_rating').addEventListener('input', function() {
+  document.getElementById('spec_rating_value').textContent = this.value;
+});
+
+// Handle form submission
+document.getElementById('laptopForm').addEventListener('submit', function(e) {
+  e.preventDefault();
   
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const targetTab = button.getAttribute('data-tab');
-      
-      // Remove active class from all buttons and contents
-      tabButtons.forEach(btn => {
-        btn.classList.remove('active', 'border-indigo-500', 'text-indigo-600');
-        btn.classList.add('border-transparent', 'text-gray-500');
-      });
-      
-      tabContents.forEach(content => {
-        content.classList.add('hidden');
-      });
-      
-      // Add active class to clicked button and show corresponding content
-      button.classList.add('active', 'border-indigo-500', 'text-indigo-600');
-      button.classList.remove('border-transparent', 'text-gray-500');
-      
-      document.getElementById(targetTab).classList.remove('hidden');
-    });
-  });
+  // Show loading indicator
+  document.getElementById('loadingIndicator').classList.remove('hidden');
+  
+  // Collect form data
+  const formData = new FormData(this);
+  
+  // Simulate API call (replace with actual endpoint)
+  setTimeout(() => {
+    // Hide loading indicator
+    document.getElementById('loadingIndicator').classList.add('hidden');
+    
+    // Show results section
+    document.getElementById('resultsSection').style.display = 'grid';
+    
+    // Update prediction (mock result)
+    const mockPrice = Math.floor(Math.random() * 100000) + 30000;
+    document.getElementById('predictedPrice').textContent = `₹${mockPrice.toLocaleString()}`;
+    
+    // Update configuration summary
+    const summary = document.getElementById('configSummary');
+    summary.innerHTML = `
+      <div class="flex justify-between"><span>Brand:</span><span>${formData.get('brand')}</span></div>
+      <div class="flex justify-between"><span>Processor:</span><span>${formData.get('processor')}</span></div>
+      <div class="flex justify-between"><span>RAM:</span><span>${formData.get('ram')} GB</span></div>
+      <div class="flex justify-between"><span>Storage:</span><span>${formData.get('storage')} GB ${formData.get('storage_type')}</span></div>
+      <div class="flex justify-between"><span>Display:</span><span>${formData.get('display_size')}" ${formData.get('resolution')}</span></div>
+      <div class="flex justify-between"><span>Graphics:</span><span>${formData.get('gpu')}</span></div>
+      <div class="flex justify-between"><span>OS:</span><span>${formData.get('os')}</span></div>
+      <div class="flex justify-between"><span>Weight:</span><span>${formData.get('weight')} kg</span></div>
+      <div class="flex justify-between"><span>Warranty:</span><span>${formData.get('warranty')} years</span></div>
+    `;
+    
+    // Scroll to results
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+  }, 2000);
 });
 </script>
 
-{% endblock content %}
+{% endblock %}
