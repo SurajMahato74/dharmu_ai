@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, PredictionHistory
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'full_name', 'phone_number', 'date_of_birth')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'full_name')}),
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'role', 'groups', 'user_permissions'),
         }),
@@ -25,7 +25,10 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('username', 'email', 'full_name', 'password1', 'password2'),
         }),
     )
-    
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.order_by('-created_at')
+
+@admin.register(PredictionHistory)
+class PredictionHistoryAdmin(admin.ModelAdmin):
+    list_display = ('brand', 'processor', 'ram', 'storage', 'predicted_price', 'created_at')
+    list_filter = ('brand', 'created_at')
+    search_fields = ('brand', 'processor')
+    readonly_fields = ('created_at',)

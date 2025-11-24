@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 py-12 px-4">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
+        Laptop Price Prediction
+      </h1>
+      <p class="text-xl text-gray-700 max-w-3xl mx-auto mb-8">
+        Get AI-powered laptop price predictions with our advanced machine learning models
+      </p>
+      <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-6 py-4 rounded-xl max-w-2xl mx-auto">
+        <p class="font-semibold">🔒 Authentication Required</p>
+        <p>Please login or create an account to access the prediction tool</p>
+      </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+      
+      <!-- Tab Headers -->
+      <div class="flex bg-gray-50">
+        <button id="loginTab" class="flex-1 py-4 px-6 text-center font-semibold text-purple-600 bg-white border-b-2 border-purple-600 transition-all">
+          Login
+        </button>
+        <button id="signupTab" class="flex-1 py-4 px-6 text-center font-semibold text-gray-500 hover:text-purple-600 transition-all">
+          Sign Up
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm" class="p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Welcome Back!</h2>
+        
+        <form method="POST" action="{% url 'login' %}?next={% url 'predict' %}">
+          {% csrf_token %}
+          
+          <div class="space-y-4">
+            <div>
+              <input type="email" name="email" placeholder="Enter your email" required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
+            </div>
+            
+            <div>
+              <input type="password" name="password" placeholder="Enter your password" required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
+            </div>
+            
+            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 rounded-xl transition">
+              Login & Start Predicting
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="signupForm" class="p-8 hidden">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create Account</h2>
+        
+        <form method="POST" action="{% url 'register' %}?next={% url 'predict' %}">
+          {% csrf_token %}
+          
+          <div class="space-y-4">
+            <div>
+              <input type="text" name="full_name" placeholder="Full Name" required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
+            </div>
+            
+            <div>
+              <input type="email" name="email" placeholder="Email Address" required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
+            </div>
+            
+            <div>
+              <input type="password" name="password" placeholder="Password (min 8 characters)" required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
+            </div>
+            
+            <div>
+              <input type="password" name="confirm_password" placeholder="Confirm Password" required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
+            </div>
+            
+            <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition">
+              Create Account & Start Predicting
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Features Preview -->
+      <div class="bg-gray-50 p-6 border-t">
+        <h3 class="font-semibold text-gray-800 mb-3">🚀 What you'll get:</h3>
+        <ul class="text-sm text-gray-600 space-y-1">
+          <li>✓ AI-powered price predictions</li>
+          <li>✓ 4 different ML models to choose from</li>
+          <li>✓ Smart laptop recommendations</li>
+          <li>✓ Instant results with minimal input</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Demo Preview -->
+    <div class="mt-12 max-w-4xl mx-auto">
+      <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">Preview: Prediction Interface</h3>
+      <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border-2 border-dashed border-purple-300">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-gray-100 rounded-lg p-3">
+            <label class="text-sm font-semibold text-gray-500">Brand *</label>
+            <div class="mt-1 bg-white rounded px-3 py-2 text-gray-400">Select Brand...</div>
+          </div>
+          <div class="bg-gray-100 rounded-lg p-3">
+            <label class="text-sm font-semibold text-gray-500">RAM</label>
+            <div class="mt-1 bg-white rounded px-3 py-2 text-gray-400">Any RAM</div>
+          </div>
+          <div class="bg-gray-100 rounded-lg p-3">
+            <label class="text-sm font-semibold text-gray-500">Storage</label>
+            <div class="mt-1 bg-white rounded px-3 py-2 text-gray-400">Any Storage</div>
+          </div>
+          <div class="bg-gray-100 rounded-lg p-3">
+            <label class="text-sm font-semibold text-gray-500">GPU</label>
+            <div class="mt-1 bg-white rounded px-3 py-2 text-gray-400">Any GPU</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex-1 bg-gray-200 rounded-xl py-4 text-center text-gray-500 font-bold">
+            🚀 Predict Price (Login Required)
+          </div>
+          <div class="bg-gray-200 rounded-xl px-4 py-4 text-gray-500 text-sm">
+            🏆 Best Model
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.getElementById('loginTab').addEventListener('click', function() {
+  // Switch to login
+  document.getElementById('loginForm').classList.remove('hidden');
+  document.getElementById('signupForm').classList.add('hidden');
+  
+  // Update tab styles
+  this.classList.add('text-purple-600', 'bg-white', 'border-b-2', 'border-purple-600');
+  this.classList.remove('text-gray-500');
+  
+  document.getElementById('signupTab').classList.remove('text-purple-600', 'bg-white', 'border-b-2', 'border-purple-600');
+  document.getElementById('signupTab').classList.add('text-gray-500');
+});
+
+document.getElementById('signupTab').addEventListener('click', function() {
+  // Switch to signup
+  document.getElementById('signupForm').classList.remove('hidden');
+  document.getElementById('loginForm').classList.add('hidden');
+  
+  // Update tab styles
+  this.classList.add('text-purple-600', 'bg-white', 'border-b-2', 'border-purple-600');
+  this.classList.remove('text-gray-500');
+  
+  document.getElementById('loginTab').classList.remove('text-purple-600', 'bg-white', 'border-b-2', 'border-purple-600');
+  document.getElementById('loginTab').classList.add('text-gray-500');
+});
+</script>
+
+{% endblock %}

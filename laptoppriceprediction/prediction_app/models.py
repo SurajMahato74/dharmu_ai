@@ -1,70 +1,79 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
-
-class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
-        return self.create_user(email, password, **extra_fields)
+import json
 
 class CustomUser(AbstractUser):
+    ROLE_CHOICES = [
+        ('user', 'User'),
+        ('staff', 'Staff'),
+        ('admin', 'Admin'),
+    ]
+    
     email = models.EmailField(unique=True)
-    full_name = models.CharField(max_length=100, blank=True)
-    phone_number = models.CharField(max_length=15, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    full_name = models.CharField(max_length=255)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # User roles
-    ROLE_CHOICES = [
-        ('user', 'Regular User'),
-        ('admin', 'Administrator'),
-        ('staff', 'Staff Member'),
-    ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
-    
-    # User status
-    is_active = models.BooleanField(default=True)
-    
-    # Override the default USERNAME_FIELD
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
-    
-    objects = CustomUserManager()
+    REQUIRED_FIELDS = ['username', 'full_name']
     
     def __str__(self):
-        return self.username
+        return self.email
     
     def get_full_name(self):
-        return self.full_name or self.username
-    
-    def get_role_display(self):
-        return dict(self.ROLE_CHOICES)[self.role]
-    
-    def is_admin(self):
-        return self.role == 'admin' or self.is_superuser
+        return self.full_name
     
     def is_staff_member(self):
-        return self.role in ['admin', 'staff'] or self.is_staff
+        return self.role in ['staff', 'admin']
+
+class PredictionHistory(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='predictions', null=True, blank=True)
+    
+    # Input configuration
+    brand = models.CharField(max_length=50, blank=True)
+    processor = models.CharField(max_length=100, blank=True)
+    ram = models.CharField(max_length=20, blank=True)
+    storage = models.CharField(max_length=20, blank=True)
+    storage_type = models.CharField(max_length=20, blank=True)
+    display_size = models.CharField(max_length=10, blank=True)
+    resolution = models.CharField(max_length=20, blank=True)
+    gpu = models.CharField(max_length=100, blank=True)
+    os = models.CharField(max_length=50, blank=True)
+    weight = models.CharField(max_length=10, blank=True)
+    warranty = models.CharField(max_length=10, blank=True)
+    spec_rating = models.CharField(max_length=10, blank=True)
+    
+    # Prediction results
+    model_used = models.CharField(max_length=50)
+    predicted_price = models.IntegerField()
+    formatted_price = models.CharField(max_length=20)
+    
+    # Suggestions (stored as JSON)
+    laptop_suggestions = models.TextField()  # JSON string
+    
+    created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
         ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.brand} - ₹{self.predicted_price:,}"
+    
+    def get_suggestions(self):
+        try:
+            return json.loads(self.laptop_suggestions)
+        except:
+            return []
+    
+    def set_suggestions(self, suggestions):
+        self.laptop_suggestions = json.dumps(suggestions)
+    
+    def get_filled_fields(self):
+        fields = {}
+        for field in ['brand', 'processor', 'ram', 'storage', 'gpu', 'os']:
+            value = getattr(self, field)
+            if value:
+                fields[field] = value
+        return fields

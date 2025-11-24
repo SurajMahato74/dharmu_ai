@@ -1,96 +1,86 @@
+#!/usr/bin/env python3
 """
-ADVANCED LAPTOP PRICE PREDICTION ANALYSIS
-=========================================
-
-This script runs advanced model analysis with:
-- Enhanced models with more epochs
-- Detailed visualizations for each model
-- Confusion matrices for regression
-- Learning curves
-- Comprehensive performance comparison
-- Individual model analysis pages
-
-Author: AI Assistant
-Date: 2024
+Advanced Analysis Runner
+Executes comprehensive analysis of the laptop price prediction models
 """
 
-import os
 import sys
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import warnings
-warnings.filterwarnings('ignore')
-
-# Import our modules
-from data_cleaning import LaptopDataCleaner
+import os
 from advanced_model_analysis import AdvancedModelAnalysis
+from analyze_data import DataAnalyzer
 
-def main():
-    """Run advanced model analysis"""
-    print("ADVANCED LAPTOP PRICE PREDICTION ANALYSIS")
-    print("="*60)
+def run_complete_analysis():
+    print("🚀 Starting Advanced Model Analysis Pipeline")
+    print("=" * 50)
     
-    # Data path
-    data_path = "c:/Users/suraj/OneDrive/Desktop/assignmen/dharmu_ai/archive/data.csv"
+    # Check if required files exist
+    required_files = [
+        'models/best_model.pkl',
+        'models/scaler.pkl',
+        'archive/data_cleaned.csv'
+    ]
     
-    # Check if data file exists
-    if not os.path.exists(data_path):
-        print(f"❌ Data file not found: {data_path}")
-        return
-    
-    start_time = datetime.now()
+    missing_files = [f for f in required_files if not os.path.exists(f)]
+    if missing_files:
+        print(f"❌ Missing required files: {missing_files}")
+        print("Please run the main pipeline first: python main_pipeline.py")
+        return False
     
     try:
-        # Step 1: Clean data (if not already done)
-        print("\n🔄 Step 1: Data Cleaning...")
-        cleaner = LaptopDataCleaner(data_path)
-        X, y, cleaned_df = cleaner.run_complete_pipeline()
+        # 1. Data Analysis
+        print("\n📊 Phase 1: Data Analysis")
+        print("-" * 30)
+        data_analyzer = DataAnalyzer('archive/data_cleaned.csv')
+        data_analyzer.basic_stats()
+        data_analyzer.price_distribution()
+        data_analyzer.brand_analysis()
+        data_analyzer.correlation_analysis()
         
-        # Step 2: Advanced Model Analysis
-        print("\n🤖 Step 2: Advanced Model Analysis...")
-        analyzer = AdvancedModelAnalysis()
-        best_model, best_name, comparison_df = analyzer.run_complete_analysis(X, y)
+        # 2. Model Analysis
+        print("\n🤖 Phase 2: Model Analysis")
+        print("-" * 30)
+        model_analyzer = AdvancedModelAnalysis(
+            'models/best_model.pkl',
+            'models/scaler.pkl',
+            'archive/data_cleaned.csv'
+        )
         
-        end_time = datetime.now()
-        duration = end_time - start_time
+        # Feature importance
+        print("\n🔍 Analyzing Feature Importance...")
+        importance_scores = model_analyzer.analyze_feature_importance()
+        if importance_scores:
+            print("Top 5 Most Important Features:")
+            sorted_features = sorted(importance_scores.items(), key=lambda x: x[1], reverse=True)
+            for feature, score in sorted_features[:5]:
+                print(f"  {feature}: {score:.4f}")
         
-        print("\n" + "="*60)
-        print("🎉 ADVANCED ANALYSIS COMPLETED SUCCESSFULLY!")
-        print("="*60)
-        print(f"⏱️  Total execution time: {duration}")
-        print(f"🏆 Best model: {best_name}")
+        # Cross-validation
+        print("\n📈 Running Cross-Validation Analysis...")
+        cv_scores = model_analyzer.cross_validation_analysis()
         
-        print("\n📊 ANALYSIS GENERATED:")
-        print("- Model comparison charts")
-        print("- Individual model analysis (2x2 plots for each model)")
-        print("- Confusion matrices for price categories")
-        print("- Learning curves")
-        print("- Comprehensive performance metrics")
+        # Learning curves
+        print("\n📚 Generating Learning Curves...")
+        model_analyzer.learning_curve_analysis()
         
-        print("\n🎯 WHAT YOU GOT:")
-        print("1. Enhanced models with more epochs (500 estimators)")
-        print("2. Detailed visualizations for each model")
-        print("3. Regression confusion matrices (price categories)")
-        print("4. Learning curves showing training progress")
-        print("5. Comprehensive metric comparison")
-        print("6. Feature importance analysis")
+        print("\n✅ Advanced analysis completed successfully!")
+        print("Check the generated plots for detailed insights.")
         
         return True
         
     except Exception as e:
-        print(f"\n❌ Analysis failed with error: {str(e)}")
-        print("Please check the error details and try again.")
+        print(f"❌ Error during analysis: {e}")
         return False
 
-if __name__ == "__main__":
-    success = main()
+def main():
+    if len(sys.argv) > 1 and sys.argv[1] == '--help':
+        print("Advanced Analysis Runner")
+        print("Usage: python run_advanced_analysis.py")
+        print("This script runs comprehensive analysis on the trained models.")
+        return
     
-    if success:
-        print("\n🚀 NEXT STEPS:")
-        print("1. Review all the generated visualizations")
-        print("2. Analyze model performance differences")
-        print("3. Use insights for model selection")
-        print("4. Run prediction interface: streamlit run prediction_interface.py")
-    else:
-        print("\n🔧 Check the error and try again")
+    success = run_complete_analysis()
+    if not success:
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
