@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import os
 from datetime import datetime
+from .models import PredictionHistory
 
 # Load the improved model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'models', 'improved_model.pkl')
@@ -242,18 +243,30 @@ def predict_price(request):
                 'error': error
             }, status=400)
         
-        # Store in history
-        prediction_record = {
-            'timestamp': datetime.now().isoformat(),
-            'specs': laptop_specs,
-            'predicted_price': predicted_price,
-            'model_used': 'improved_gradient_boosting'
-        }
-        prediction_history.append(prediction_record)
+        # Save to database
+        suggestions = [
+            {
+                'name': f'{laptop_specs["brand"]} Budget Laptop',
+                'full_name': f'{laptop_specs["brand"]} {laptop_specs["ram"]} {laptop_specs["storage"]} Laptop',
+                'price': predicted_price * 0.9,
+                'category': 'Budget Option',
+                'specs': f'{laptop_specs["ram"]} RAM, {laptop_specs["storage"]} Storage, {laptop_specs["gpu"]}',
+                'details': 'Great value for money with reliable performance'
+            }
+        ]
         
-        # Keep only last 100 predictions
-        if len(prediction_history) > 100:
-            prediction_history.pop(0)
+        prediction_record = PredictionHistory.objects.create(
+            brand=laptop_specs['brand'],
+            processor=laptop_specs['processor'],
+            ram=laptop_specs['ram'],
+            storage=laptop_specs['storage'],
+            gpu=laptop_specs['gpu'],
+            os=laptop_specs['OS'],
+            model_used='Improved Gradient Boosting',
+            predicted_price=int(predicted_price),
+            formatted_price=f'Rs.{predicted_price:,.0f}',
+            laptop_suggestions=json.dumps(suggestions)
+        )
         
         # Debug info
         ram_gb = extract_numeric_features(laptop_specs)['ram_gb']
@@ -325,10 +338,22 @@ def predict_price(request):
 @require_http_methods(["GET"])
 def prediction_history_view(request):
     """API endpoint to get prediction history"""
+    predictions = PredictionHistory.objects.all()[:20]
+    history = []
+    
+    for pred in predictions:
+        history.append({
+            'timestamp': pred.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'config': pred.get_filled_fields(),
+            'model_used': pred.model_used,
+            'formatted_price': pred.formatted_price,
+            'suggestions': pred.get_suggestions()
+        })
+    
     return JsonResponse({
         'success': True,
-        'history': prediction_history[-20:],  # Last 20 predictions
-        'total_predictions': len(prediction_history)
+        'history': history,
+        'total_predictions': PredictionHistory.objects.count()
     })
 
 @require_http_methods(["GET"])
