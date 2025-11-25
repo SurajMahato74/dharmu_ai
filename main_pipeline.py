@@ -334,7 +334,7 @@ def main():
     print("=" * 50)
     
     # Data path
-    data_path = "c:/Users/suraj/OneDrive/Desktop/assignmen/dharmu_ai/archive/data.csv"
+    data_path = "C:/Users/developer\Desktop/CollageFinalProject/laptop_price/dharmu_ai/archive/data.csv"
     
     # Check if data file exists
     if not os.path.exists(data_path):

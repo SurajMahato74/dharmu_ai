@@ -191,6 +191,7 @@ class FINAL_PERFECT_REPORT:
 
 # RUN IT
 if __name__ == "__main__":
-    path = "c:/Users/suraj/OneDrive/Desktop/assignmen/dharmu_ai/archive/data.csv"
+    path = "C:/Users/developer\Desktop/CollageFinalProject/laptop_price/dharmu_ai/archive/data.csv"
+    
     report = FINAL_PERFECT_REPORT(path)
     report.run()

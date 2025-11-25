@@ -700,36 +700,129 @@ def about(request):
 def login_view(request):
     """Login page"""
     if request.user.is_authenticated:
+        print(f"DEBUG: User already authenticated - {request.user.email}, Role: {getattr(request.user, 'role', 'N/A')}")
         # Check if user is superuser or admin/staff and redirect to admin dashboard
         if request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member()):
             return redirect('admin_dashboard')
         else:
             return redirect('predict')
-    
+
     if request.method == 'POST':
+        print("DEBUG: Login POST request received")
         from django.contrib.auth import authenticate, login
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        
+        import logging
+
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '')
+
+        print(f"DEBUG: Login attempt - Email: '{email}', Password length: {len(password)}")
+
         user = authenticate(request, email=email, password=password)
         if user is not None:
+            print(f"DEBUG: Authentication successful - User: {user.email}, Role: {user.role}, Active: {user.is_active}")
             login(request, user)
+
+            # Log successful login
+            logging.info(f"User logged in: {user.email} (Role: {user.role})")
+
             # Redirect superusers and admin/staff to admin dashboard, others to predict page
             if user.is_superuser or (hasattr(user, 'is_staff_member') and user.is_staff_member()):
                 next_url = request.GET.get('next', 'admin_dashboard')
+                print(f"DEBUG: Redirecting admin/staff user to: {next_url}")
             else:
                 next_url = request.GET.get('next', 'predict')
+                print(f"DEBUG: Redirecting regular user to: {next_url}")
             return redirect(next_url)
         else:
+            print(f"DEBUG: Authentication failed for email: {email}")
+            # Log failed login attempt
+            logging.warning(f"Failed login attempt for email: {email}")
+
             # Authentication failed
             return render(request, 'prediction_app/login.html', {
                 'error': 'Invalid email or password'
             })
-    
+
     return render(request, 'prediction_app/login.html')
 
 def register_view(request):
     """Register page"""
+    if request.method == 'POST':
+        print("DEBUG: Registration POST request received")
+        from django.contrib.auth import login
+        from .models import CustomUser
+
+        full_name = request.POST.get('full_name', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+
+        print(f"DEBUG: Registration data - Full Name: '{full_name}', Email: '{email}', Password length: {len(password)}")
+
+        # Validation
+        errors = []
+
+        if not full_name:
+            errors.append('Full name is required')
+        if not email:
+            errors.append('Email is required')
+        elif '@' not in email:
+            errors.append('Invalid email format')
+        if len(password) < 8:
+            errors.append('Password must be at least 8 characters long')
+        if password != confirm_password:
+            errors.append('Passwords do not match')
+
+        # Check if user already exists
+        if CustomUser.objects.filter(email=email).exists():
+            errors.append('An account with this email already exists')
+
+        if errors:
+            print(f"DEBUG: Registration validation errors: {errors}")
+            return render(request, 'prediction_app/register.html', {
+                'errors': errors,
+                'full_name': full_name,
+                'email': email
+            })
+
+        try:
+            # Check if this is the first user (make them admin)
+            is_first_user = not CustomUser.objects.exists()
+            user_role = 'admin' if is_first_user else 'user'
+
+            # Create user
+            user = CustomUser.objects.create_user(
+                username=email,  # Use email as username since USERNAME_FIELD is email
+                email=email,
+                password=password,
+                full_name=full_name,
+                role=user_role
+            )
+
+            print(f"DEBUG: User created successfully - ID: {user.id}, Email: {user.email}, Role: {user.role}")
+            if is_first_user:
+                print("DEBUG: First user created - automatically assigned admin role")
+
+            # Log the user in immediately after registration
+            login(request, user)
+            print(f"DEBUG: User logged in after registration - {user.email}")
+
+            # Redirect based on role
+            if user.is_staff_member():
+                return redirect('admin_dashboard')
+            else:
+                return redirect('predict')
+
+        except Exception as e:
+            print(f"DEBUG: Error creating user: {e}")
+            import logging
+            logging.error(f"Registration error for {email}: {e}")
+            return render(request, 'prediction_app/register.html', {
+                'errors': ['An error occurred during registration. Please try again.'],
+                'full_name': full_name,
+                'email': email
+            })
+
     return render(request, 'prediction_app/register.html')
 
 def logout_view(request):

@@ -287,7 +287,7 @@ class LaptopDataCleaner:
 # Example usage
 if __name__ == "__main__":
     # Initialize data cleaner
-    data_path = "c:/Users/suraj/OneDrive/Desktop/assignmen/dharmu_ai/archive/data.csv"
+    data_path = "C:/Users/developer\Desktop/CollageFinalProject/laptop_price/dharmu_ai/archive/data.csv"
     cleaner = LaptopDataCleaner(data_path)
     
     # Run complete pipeline

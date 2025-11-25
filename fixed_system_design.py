@@ -180,7 +180,7 @@ class FixedSystemDesign:
                 # Attributes
                 attr_y = y + h - 0.6
                 for attr in attrs:
-                    ax.text(x + 0.1, attr_y, attr, fontsize=7, va='top')
+                    ax.text(x + 0.1, attr_y, attr, fontsize=7, va='top', family='monospace')
                     attr_y -= 0.25
                 
                 # Separator
@@ -189,7 +189,7 @@ class FixedSystemDesign:
                 # Methods
                 method_y = attr_y
                 for method in methods:
-                    ax.text(x + 0.1, method_y, method, fontsize=7, va='top')
+                    ax.text(x + 0.1, method_y, method, fontsize=7, va='top', family='monospace')
                     method_y -= 0.25
         
         # Simple relationships (no overlapping lines)
@@ -492,31 +492,30 @@ Cons:
         # Messages with proper vertical spacing
         messages = [
             # (from_x, to_x, y, message, color)
-            (2, 5, 11.2, '1: openApp()', 'blue'),
-            (5, 8, 10.8, '2: requestAuth()', 'blue'),
-            (8, 5, 10.4, '3: showLoginForm()', 'green'),
-            (2, 5, 10.0, '4: login(username, password)', 'blue'),
-            (5, 8, 9.6, '5: validateCredentials()', 'blue'),
-            (8, 17, 9.2, '6: checkUser()', 'blue'),
-            (17, 8, 8.8, '7: userValid', 'green'),
-            (8, 5, 8.4, '8: authSuccess', 'green'),
-            (5, 2, 8.0, '9: showDashboard()', 'green'),
+            (2, 5, 11.2, 'openApp()', 'blue'),
+            (5, 8, 10.8, 'requestAuth()', 'blue'),
+            (8, 5, 10.4, 'showLoginForm()', 'green'),
+            (2, 5, 10.0, 'login(username, password)', 'blue'),
+            (5, 8, 9.6, 'validateCredentials()', 'blue'),
+            (8, 17, 9.2, 'checkUser()', 'blue'),
+            (17, 8, 8.8, 'userValid', 'green'),
+            (8, 5, 8.4, 'authSuccess', 'green'),
+            (5, 2, 8.0, 'showDashboard()', 'green'),
             
-            (2, 5, 7.4, '10: inputSpecs(brand, ram, etc)', 'blue'),
-            (5, 11, 7.0, '11: processInput()', 'blue'),
-            (11, 17, 6.6, '12: validateData()', 'blue'),
-            (17, 11, 6.2, '13: dataValid', 'green'),
-            (11, 14, 5.8, '14: predict(features)', 'blue'),
-            (14, 17, 5.4, '15: getModelData()', 'blue'),
-            (17, 14, 5.0, '16: modelData', 'green'),
-            (14, 11, 4.6, '17: predictionResult', 'green'),
-            (11, 5, 4.2, '18: formattedResult', 'green'),
-            (5, 2, 3.8, '19: displayPrediction()', 'green'),
+            (2, 5, 7.4, 'inputSpecs(brand, ram, etc)', 'blue'),
+            (5, 11, 7.0, 'processInput()', 'blue'),
+            (11, 17, 6.6, 'validateData()', 'blue'),
+            (17, 11, 6.2, 'dataValid', 'green'),
+            (11, 14, 5.8, 'predict(features)', 'blue'),
+            (14, 17, 5.4, 'getModelData()', 'blue'),
+            (17, 14, 5.0, 'modelData', 'green'),
+            (14, 11, 4.6, 'predictionResult', 'green'),
+            (11, 5, 4.2, 'formattedResult', 'green'),
             
-            (2, 5, 3.2, '20: savePrediction()', 'blue'),
-            (5, 17, 2.8, '21: storePrediction()', 'blue'),
-            (17, 5, 2.4, '22: saved', 'green'),
-            (5, 2, 2.0, '23: confirmSaved()', 'green')
+            (2, 5, 3.2, 'savePrediction()', 'blue'),
+            (5, 17, 2.8, 'storePrediction()', 'blue'),
+            (17, 5, 2.4, 'saved', 'green'),
+            (5, 2, 2.0, 'confirmSaved()', 'green')
         ]
         
         # Draw messages
@@ -566,21 +565,7 @@ Cons:
                 ax.plot([1], [y_pos], '>', color=color, markersize=8)
             ax.text(1.2, y_pos, label, fontsize=8, va='center')
         
-        # Description
-        desc = """Sequence Flow Description:
-1-9: User authentication and login process
-10-19: Laptop specification input and prediction
-20-23: Save prediction results to database
 
-Key Interactions:
-• User provides input through web interface
-• Authentication service validates credentials
-• Data processor handles input validation
-• ML model generates price predictions
-• Database stores all transactions"""
-        
-        ax.text(0.5, 6, desc, fontsize=9, va='top',
-                bbox=dict(boxstyle="round,pad=0.5", facecolor="lightcyan", alpha=0.8))
         
         plt.tight_layout()
         plt.show()
@@ -1059,36 +1044,36 @@ Key Features:
         # Refined message sequence with error handling
         messages = [
             # Authentication Phase with detailed security
-            (2, 5, 13.8, '1: POST /predict', 'blue', 'sync'),
-            (5, 8, 13.4, '2: authenticate(token)', 'blue', 'sync'),
-            (8, 17, 13.0, '3: validateToken()', 'blue', 'sync'),
-            (17, 8, 12.6, '4: tokenValid', 'green', 'return'),
-            (8, 5, 12.2, '5: authSuccess', 'green', 'return'),
+            (2, 5, 13.8, ' POST /predict', 'blue', 'sync'),
+            (5, 8, 13.4, ' authenticate(token)', 'blue', 'sync'),
+            (8, 17, 13.0, ' validateToken()', 'blue', 'sync'),
+            (17, 8, 12.6, ' tokenValid', 'green', 'return'),
+            (8, 5, 12.2, 'authSuccess', 'green', 'return'),
             
             # Input Processing with validation
-            (5, 11, 11.8, '6: processRequest(specs)', 'blue', 'sync'),
-            (11, 17, 11.4, '7: validateInput(specs)', 'blue', 'sync'),
-            (17, 11, 11.0, '8: validationResult', 'green', 'return'),
+            (5, 11, 11.8, 'processRequest(specs)', 'blue', 'sync'),
+            (11, 17, 11.4, ' validateInput(specs)', 'blue', 'sync'),
+            (17, 11, 11.0, ' validationResult', 'green', 'return'),
             
             # Cache Check (Performance Optimization)
-            (11, 20, 10.6, '9: checkCache(key)', 'purple', 'async'),
-            (20, 11, 10.2, '10: cacheHit/Miss', 'purple', 'return'),
+            (11, 20, 10.6, ' checkCache(key)', 'purple', 'async'),
+            (20, 11, 10.2, ' cacheHit/Miss', 'purple', 'return'),
             
             # ML Model Processing (if cache miss)
-            (11, 14, 9.8, '11: createModel(type)', 'blue', 'sync'),
-            (14, 17, 9.4, '12: loadModelData()', 'blue', 'sync'),
-            (17, 14, 9.0, '13: modelData', 'green', 'return'),
-            (14, 11, 8.6, '14: predict(features)', 'green', 'return'),
+            (11, 14, 9.8, ' createModel(type)', 'blue', 'sync'),
+            (14, 17, 9.4, ' loadModelData()', 'blue', 'sync'),
+            (17, 14, 9.0, ' modelData', 'green', 'return'),
+            (14, 11, 8.6, 'predict(features)', 'green', 'return'),
             
             # Caching Result
-            (11, 20, 8.2, '15: cacheResult(key, result)', 'purple', 'async'),
+            (11, 20, 8.2, ' cacheResult(key, result)', 'purple', 'async'),
             
             # Audit Logging (Async)
-            (11, 23, 7.8, '16: logPrediction()', 'orange', 'async'),
+            (11, 23, 7.8, ' logPrediction()', 'orange', 'async'),
             
             # Response Formation
-            (11, 5, 7.4, '17: formatResponse(result)', 'green', 'return'),
-            (5, 2, 7.0, '18: HTTP 200 + JSON', 'green', 'return'),
+            (11, 5, 7.4, ' formatResponse(result)', 'green', 'return'),
+            (5, 2, 7.0, 'HTTP 200 + JSON', 'green', 'return'),
             
             # Error Handling Scenario (Alternative Flow)
             (8, 5, 6.2, 'ALT: authFailed', 'red', 'error'),
