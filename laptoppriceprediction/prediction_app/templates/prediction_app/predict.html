@@ -417,7 +417,7 @@ function addToChatHistory(predictionData) {
     suggestions: predictionData.laptop_suggestions
   };
   
-  chatHistory.unshift(newPred);
+  chatHistory.push(newPred);
   
   // Update chat if panel is open
   if (!document.getElementById('chatPanel').classList.contains('translate-x-full')) {

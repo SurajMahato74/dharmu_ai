@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div>
+          <div class="flex items-center space-x-4">
+            <a href="{% url 'admin_dashboard' %}" class="text-indigo-600 hover:text-indigo-800">
+              <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+          </div>
+          <h1 class="text-3xl font-bold text-gray-900 mt-2">User Chat History</h1>
+          <p class="mt-1 text-sm text-gray-600">Complete prediction history for {{ target_user.get_full_name|default:target_user.username }}</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="text-right">
+            <div class="text-sm text-gray-700">{{ target_user.email }}</div>
+            <div class="text-xs text-gray-500">
+              Role: {{ target_user.get_role_display }} | 
+              Status: {% if target_user.is_active %}Active{% else %}Inactive{% endif %}
+            </div>
+          </div>
+          <a href="{% url 'logout' %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- User Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
+                <i class="fas fa-comments text-white"></i>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Total Predictions</dt>
+                <dd class="text-lg font-medium text-gray-900">{{ total_predictions }}</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                <i class="fas fa-calendar text-white"></i>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">First Activity</dt>
+                <dd class="text-sm font-medium text-gray-900">
+                  {% if user_predictions.last %}
+                    {{ user_predictions.last.created_at|date:"M d, Y" }}
+                  {% else %}
+                    No activity
+                  {% endif %}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                <i class="fas fa-clock text-white"></i>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Last Activity</dt>
+                <dd class="text-sm font-medium text-gray-900">
+                  {% if user_predictions.first %}
+                    {{ user_predictions.first.created_at|date:"M d, Y H:i" }}
+                  {% else %}
+                    No activity
+                  {% endif %}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat History -->
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Prediction History</h3>
+        <p class="mt-1 text-sm text-gray-600">All laptop price predictions made by this user</p>
+      </div>
+      <div class="p-6">
+        {% if user_predictions %}
+        <div class="space-y-6">
+          {% for prediction in user_predictions %}
+          <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h4 class="text-lg font-medium text-gray-900">
+                  {{ prediction.brand|default:"Unknown Brand" }} Laptop Prediction
+                </h4>
+                <p class="text-sm text-gray-500">
+                  {{ prediction.created_at|date:"F d, Y \a\t H:i" }}
+                </p>
+              </div>
+              <div class="text-right">
+                <div class="text-2xl font-bold text-green-600">{{ prediction.formatted_price }}</div>
+                <div class="text-sm text-gray-500">{{ prediction.model_used }}</div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              <div>
+                <h5 class="text-sm font-medium text-gray-700 mb-2">Hardware Specifications</h5>
+                <div class="space-y-1 text-sm text-gray-600">
+                  <div><strong>Processor:</strong> {{ prediction.processor|default:"Not specified" }}</div>
+                  <div><strong>RAM:</strong> {{ prediction.ram|default:"Not specified" }}</div>
+                  <div><strong>Storage:</strong> {{ prediction.storage|default:"Not specified" }}</div>
+                  <div><strong>GPU:</strong> {{ prediction.gpu|default:"Not specified" }}</div>
+                </div>
+              </div>
+              
+              <div>
+                <h5 class="text-sm font-medium text-gray-700 mb-2">System Details</h5>
+                <div class="space-y-1 text-sm text-gray-600">
+                  <div><strong>Operating System:</strong> {{ prediction.os|default:"Not specified" }}</div>
+                  {% if prediction.spec_rating %}
+                  <div><strong>Spec Rating:</strong> {{ prediction.spec_rating }}/100</div>
+                  {% endif %}
+                  {% if prediction.display_size %}
+                  <div><strong>Display:</strong> {{ prediction.display_size }}"</div>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div>
+                <h5 class="text-sm font-medium text-gray-700 mb-2">Model Information</h5>
+                <div class="space-y-1 text-sm text-gray-600">
+                  <div><strong>Model Used:</strong> {{ prediction.model_used }}</div>
+                  <div><strong>Prediction ID:</strong> #{{ prediction.id }}</div>
+                  <div><strong>Timestamp:</strong> {{ prediction.created_at|date:"M d, Y H:i:s" }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Laptop Suggestions -->
+            {% with suggestions=prediction.get_suggestions %}
+            {% if suggestions %}
+            <div class="border-t border-gray-200 pt-4">
+              <h5 class="text-sm font-medium text-gray-700 mb-2">Recommended Laptops</h5>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {% for suggestion in suggestions %}
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="font-medium text-sm text-gray-900">{{ suggestion.name|default:"Recommended Laptop" }}</div>
+                  <div class="text-sm text-gray-600">{{ suggestion.specs|default:"" }}</div>
+                  <div class="text-sm font-medium text-green-600">₹{{ suggestion.price|floatformat:0|default:prediction.predicted_price }}</div>
+                  {% if suggestion.details %}
+                  <div class="text-xs text-gray-500 mt-1">{{ suggestion.details }}</div>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+          <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-comments text-gray-400 text-3xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No Chat History</h3>
+          <p class="text-gray-500">This user hasn't made any predictions yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.db.models import Q
 import json
 import joblib
 import pandas as pd
@@ -131,7 +132,13 @@ def extract_numeric_features(data):
         if pd.isna(gpu_str) or gpu_str == '':
             return 0
         gpu_str = str(gpu_str).upper()
-        if 'GB' in gpu_str and any(x in gpu_str for x in ['NVIDIA', 'AMD', 'RTX', 'GTX']):
+        
+        # Handle integrated graphics (typically shared memory)
+        if any(x in gpu_str for x in ['INTEL UHD', 'INTEL IRON', 'INTEL INTEGRATED', 'INTEL HD', 'INTEL GRAPHICS']):
+            return 1  # Integrated graphics typically have 1-2GB shared memory
+        
+        # Handle dedicated graphics
+        if 'GB' in gpu_str:
             try:
                 # Extract number before GB
                 parts = gpu_str.split('GB')[0].split()
@@ -140,6 +147,29 @@ def extract_numeric_features(data):
                         return int(part)
             except:
                 pass
+        
+        # Check for specific GPU patterns without explicit GB
+        if any(x in gpu_str for x in ['RTX', 'GTX']):
+            if '4090' in gpu_str:
+                return 24
+            elif '4080' in gpu_str:
+                return 16
+            elif '4070' in gpu_str:
+                return 12
+            elif '4060' in gpu_str:
+                return 8
+            elif '4050' in gpu_str:
+                return 6
+            elif '3080' in gpu_str:
+                return 10
+            elif '3070' in gpu_str:
+                return 8
+            elif '3060' in gpu_str:
+                return 6
+            elif '3050' in gpu_str:
+                return 4
+        
+        # Default for unknown GPUs
         return 0
     
     data['ram_gb'] = extract_ram(data.get('ram', '8GB'))
@@ -456,13 +486,28 @@ def predict_price(request):
             res_width = 1920
             res_height = 1080
         
+        # Extract and normalize input data
+        raw_ram = data.get('ram', '8')
+        raw_storage = data.get('storage', '512')
+        raw_brand = data.get('brand', 'HP')
+        raw_processor = data.get('processor', 'Intel Core i5')
+        raw_gpu = data.get('gpu', 'Intel UHD Graphics')
+        raw_os = data.get('os', 'Windows 11 OS')
+        raw_model_type = data.get('model_type', 'best')
+        
+        # Convert to string and clean
+        ram_str = safe_str(raw_ram, '8')
+        storage_str = safe_str(raw_storage, '512')
+        
+        print(f"DEBUG: Raw input data - RAM: {raw_ram}, Storage: {raw_storage}, Brand: {raw_brand}, Model Type: {raw_model_type}")
+        
         laptop_specs = {
-            'brand': safe_str(data.get('brand'), 'HP'),
-            'ram': safe_str(data.get('ram'), '8') + 'GB',
-            'storage': safe_str(data.get('storage'), '512') + 'GB',
-            'gpu': safe_str(data.get('gpu'), 'Intel UHD Graphics'),
-            'processor': safe_str(data.get('processor'), 'Intel Core i5'),
-            'OS': safe_str(data.get('os'), 'Windows 11 OS'),
+            'brand': safe_str(raw_brand, 'HP'),
+            'ram': ram_str + 'GB' if not ram_str.endswith('GB') else ram_str,
+            'storage': storage_str + 'GB' if not storage_str.endswith('GB') else storage_str,
+            'gpu': safe_str(raw_gpu, 'Intel UHD Graphics'),
+            'processor': safe_str(raw_processor, 'Intel Core i5'),
+            'OS': safe_str(raw_os, 'Windows 11 OS'),
             'spec_rating': safe_float(data.get('spec_rating'), 65),
             'display_size': safe_float(data.get('display_size'), 15.6),
             'resolution_width': res_width,
@@ -470,8 +515,10 @@ def predict_price(request):
             'name': safe_str(data.get('name'), 'Laptop')
         }
         
+        print(f"DEBUG: Processed laptop_specs: {laptop_specs}")
+        
         # Get selected model type
-        model_type = data.get('model_type', 'best')
+        model_type = raw_model_type
         
         # Predict price
         predicted_price, error, model_used = predict_laptop_price(laptop_specs, model_type)
@@ -482,7 +529,15 @@ def predict_price(request):
                 'error': error
             }, status=400)
         
-        # Save to database
+        # Validate data consistency before saving
+        print(f"DEBUG: VALIDATION - About to save prediction:")
+        print(f"  Brand: {laptop_specs['brand']}")
+        print(f"  RAM: {laptop_specs['ram']}")
+        print(f"  Storage: {laptop_specs['storage']}")
+        print(f"  Model: {model_used}")
+        print(f"  Predicted Price: {predicted_price}")
+        
+        # Create suggestions using the exact same data as the prediction
         suggestions = [
             {
                 'name': f'{laptop_specs["brand"]} Budget Laptop',
@@ -507,6 +562,10 @@ def predict_price(request):
             formatted_price=f'Rs.{predicted_price:,.0f}',
             laptop_suggestions=json.dumps(suggestions)
         )
+        
+        print(f"DEBUG: Successfully saved prediction record ID: {prediction_record.id}")
+        print(f"DEBUG: Saved RAM: {prediction_record.ram}, Storage: {prediction_record.storage}")
+        print(f"DEBUG: Saved Model: {prediction_record.model_used}, Price: {prediction_record.predicted_price}")
         
         # Debug info
         ram_gb = extract_numeric_features(laptop_specs)['ram_gb']
@@ -579,7 +638,7 @@ def predict_price(request):
 @login_required
 def prediction_history_view(request):
     """API endpoint to get prediction history for authenticated user"""
-    predictions = PredictionHistory.objects.filter(user=request.user)[:20]
+    predictions = PredictionHistory.objects.filter(user=request.user).order_by('created_at')[:20]
     history = []
     
     for pred in predictions:
@@ -641,7 +700,11 @@ def about(request):
 def login_view(request):
     """Login page"""
     if request.user.is_authenticated:
-        return redirect('predict')
+        # Check if user is superuser or admin/staff and redirect to admin dashboard
+        if request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member()):
+            return redirect('admin_dashboard')
+        else:
+            return redirect('predict')
     
     if request.method == 'POST':
         from django.contrib.auth import authenticate, login
@@ -651,7 +714,11 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            next_url = request.GET.get('next', 'predict')
+            # Redirect superusers and admin/staff to admin dashboard, others to predict page
+            if user.is_superuser or (hasattr(user, 'is_staff_member') and user.is_staff_member()):
+                next_url = request.GET.get('next', 'admin_dashboard')
+            else:
+                next_url = request.GET.get('next', 'predict')
             return redirect(next_url)
         else:
             # Authentication failed
@@ -677,6 +744,179 @@ def dashboard(request):
     """Dashboard page"""
     return render(request, 'prediction_app/dashboard.html')
 
+@login_required
+def admin_dashboard(request):
+    """Admin dashboard page - only for admin users and superusers"""
+    if not (request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member())):
+        return redirect('dashboard')
+    
+    # Get user statistics
+    from .models import CustomUser
+    
+    total_users = CustomUser.objects.count()
+    active_users = CustomUser.objects.filter(is_active=True).count()
+    inactive_users = CustomUser.objects.filter(is_active=False).count()
+    admin_users = CustomUser.objects.filter(role='admin').count()
+    staff_users = CustomUser.objects.filter(role='staff').count()
+    
+    # Get prediction statistics
+    total_predictions = PredictionHistory.objects.count()
+    
+    # Handle filtering
+    users = CustomUser.objects.all().order_by('-created_at')
+    
+    search = request.GET.get('search', '').strip()
+    role_filter = request.GET.get('role', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+    
+    if search:
+        users = users.filter(
+            Q(full_name__icontains=search) | 
+            Q(email__icontains=search) | 
+            Q(username__icontains=search)
+        )
+    
+    if role_filter:
+        users = users.filter(role=role_filter)
+    
+    if status_filter == 'active':
+        users = users.filter(is_active=True)
+    elif status_filter == 'inactive':
+        users = users.filter(is_active=False)
+    
+    # Limit results
+    users = users[:50]
+    
+    return render(request, 'admin/admin_dashboard.html', {
+        'total_users': total_users,
+        'active_users': active_users,
+        'inactive_users': inactive_users,
+        'admin_users': admin_users,
+        'staff_users': staff_users,
+        'total_predictions': total_predictions,
+        'users': users
+    })
+
+@login_required
+def toggle_user_status(request, user_id):
+    """Toggle user active status - admin only"""
+    if not (request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member())):
+        return JsonResponse({'success': False, 'message': 'Access denied'})
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Method not allowed'})
+    
+    try:
+        from .models import CustomUser
+        user = CustomUser.objects.get(id=user_id)
+        
+        # Prevent self-deactivation
+        if user == request.user:
+            return JsonResponse({'success': False, 'message': 'Cannot deactivate your own account'})
+        
+        user.is_active = not user.is_active
+        user.save()
+        
+        status = 'activated' if user.is_active else 'deactivated'
+        return JsonResponse({
+            'success': True, 
+            'message': f'User successfully {status}'
+        })
+        
+    except CustomUser.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User not found'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+@login_required
+def change_user_role(request, user_id):
+    """Change user role - admin only"""
+    if not (request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member())):
+        return JsonResponse({'success': False, 'message': 'Access denied'})
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Method not allowed'})
+    
+    try:
+        from .models import CustomUser
+        user = CustomUser.objects.get(id=user_id)
+        
+        # Prevent self-role change
+        if user == request.user:
+            return JsonResponse({'success': False, 'message': 'Cannot change your own role'})
+        
+        new_role = request.POST.get('role')
+        if new_role not in ['user', 'staff', 'admin']:
+            return JsonResponse({'success': False, 'message': 'Invalid role'})
+        
+        user.role = new_role
+        user.save()
+        
+        return JsonResponse({
+            'success': True, 
+            'message': f'User role successfully changed to {user.get_role_display()}'
+        })
+        
+    except CustomUser.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User not found'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+@login_required
+def delete_user(request, user_id):
+    """Delete user - admin only"""
+    if not (request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member())):
+        return JsonResponse({'success': False, 'message': 'Access denied'})
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Method not allowed'})
+    
+    try:
+        from .models import CustomUser
+        user = CustomUser.objects.get(id=user_id)
+        
+        # Prevent self-deletion
+        if user == request.user:
+            return JsonResponse({'success': False, 'message': 'Cannot delete your own account'})
+        
+        # Prevent deletion of other admins unless superuser
+        if user.role == 'admin' and not request.user.is_superuser:
+            return JsonResponse({'success': False, 'message': 'Only superusers can delete admin accounts'})
+        
+        user.delete()
+        
+        return JsonResponse({
+            'success': True, 
+            'message': 'User successfully deleted'
+        })
+        
+    except CustomUser.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User not found'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
 def get_prediction_history(request):
     """Get prediction history - alias for prediction_history_view"""
     return prediction_history_view(request)
+
+@login_required
+def user_chat_history(request, user_id):
+    """Show complete chat history for a specific user - admin only"""
+    if not (request.user.is_superuser or (hasattr(request.user, 'is_staff_member') and request.user.is_staff_member())):
+        return redirect('admin_dashboard')
+    
+    try:
+        from .models import CustomUser
+        target_user = CustomUser.objects.get(id=user_id)
+        
+        # Get all predictions for this user
+        user_predictions = PredictionHistory.objects.filter(user=target_user).order_by('-created_at')
+        
+        return render(request, 'admin/user_chat_history.html', {
+            'target_user': target_user,
+            'user_predictions': user_predictions,
+            'total_predictions': user_predictions.count()
+        })
+        
+    except CustomUser.DoesNotExist:
+        return redirect('admin_dashboard')
