@@ -32,7 +32,7 @@
     <!-- Desktop Buttons -->
     <div class="hidden md:flex items-center space-x-5">
       {% if user.is_authenticated %}
-        {% if user.is_staff_member %}
+        {% if user.is_staff %}
         <a href="{% url 'admin_dashboard' %}" class="font-medium hover:text-indigo-600">Admin Dashboard</a>
         {% endif %}
         <span class="text-gray-700">Welcome, {{ user.get_full_name }}!</span>
@@ -92,7 +92,7 @@
       <a href="{% url 'how_it_work' %}" class="block py-3 text-gray-800 font-medium hover:text-indigo-600 transition">How It Works</a>
       <a href="{% url 'predict' %}" class="block py-3 text-gray-800 font-medium hover:text-indigo-600 transition">Predict Price</a>
       <a href="{% url 'about' %}" class="block py-3 text-gray-800 font-medium hover:text-indigo-600 transition">About</a>
-      {% if user.is_staff_member %}
+      {% if user.is_staff %}
       <a href="{% url 'admin_dashboard' %}" class="block py-3 text-purple-600 font-medium hover:text-purple-700 transition">Admin Dashboard</a>
       {% endif %}
     </nav>
