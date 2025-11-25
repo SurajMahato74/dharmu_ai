@@ -36,7 +36,7 @@
         <a href="{% url 'admin_dashboard' %}" class="font-medium hover:text-indigo-600">Admin Dashboard</a>
         {% endif %}
         <span class="text-gray-700">Welcome, {{ user.get_full_name }}!</span>
-        <a href="{% url 'logout' %}" class="font-medium hover:text-indigo-600">Logout</a>
+        <a href="{% url 'logout' %}" class="bg-gradient-to-r from-red-600 to-red-600 text-white px-7 py-2 rounded-full font-semibold  transition">Logout</a>
       {% else %}
         <a href="{% url 'login' %}" class="font-medium hover:text-indigo-600">Login</a>
         <a href="{% url 'register' %}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-7 py-3 rounded-full font-semibold hover:shadow-xl transition">Register</a>

@@ -558,7 +558,7 @@ def predict_price(request):
             gpu=laptop_specs['gpu'],
             os=laptop_specs['OS'],
             model_used=model_used,
-            predicted_price=int(predicted_price),
+            predicted_price=int(predicted_price * 1.6),
             formatted_price=f'Rs.{predicted_price:,.0f}',
             laptop_suggestions=json.dumps(suggestions)
         )
